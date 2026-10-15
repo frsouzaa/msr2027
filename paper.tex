@@ -3,6 +3,7 @@
 % The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
 %Template version as of 6/27/2024
 
+\usepackage{svg}
 \usepackage{cite}
 \usepackage{amsmath,amssymb,amsfonts}
 \usepackage{algorithmic}
@@ -202,11 +203,17 @@ copy& More table copy$^{\mathrm{a}}$& &  \\
 \end{center}
 \end{table}
 
-\begin{figure}[htbp]
-\centerline{\includegraphics{fig1.png}}
-\caption{Example of a figure caption.}
-\label{fig}
-\end{figure}
+% \begin{figure}[htbp]
+% \centerline{\includesvg[width=0.5\textwidth]{fig1.svg}}
+% \caption{Correlation analysis of GitHub repositories features.}
+% \end{figure}
+
+\begin{figure*}[t]
+    \centering
+    \includesvg[width=0.8\textwidth]{fig1.svg}
+    \caption{Correlation analysis of GitHub repositories features.}
+    \label{fig}
+\end{figure*}
 
 Figure Labels: Use 8 point Times New Roman for Figure labels. Use words 
 rather than symbols or abbreviations when writing Figure axis labels to 
