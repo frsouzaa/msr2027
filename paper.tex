@@ -10,6 +10,8 @@
 \usepackage{graphicx}
 \usepackage{textcomp}
 \usepackage{xcolor}
+\usepackage{tabularx}
+\usepackage{float}
 
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
@@ -44,22 +46,76 @@ TODO
 \section{Related Work}
 TODO
 \cite{DBLP:journals/corr/BorgesHV16a}
-\cite{DBLP:journals/corr/abs-2103-04682}
 \cite{10.1145/3793302.3793350}
 \cite{COELHO2020106274}
 \cite{10.1145/3555228.3555264}
 \cite{WANG2023111806}
-\cite{6624048}
-\cite{10.1145/3236024.3264598}
-\cite{10.1145/3793302.3793321}
 
 \section{Methodology}
-TODO
+This section presents the process of data acquisition, preparation, synthesis and analysis, according to the best practices for Mine Software Repositories (MSR) proposed by \cite{cookbook}.
 
-\section{Data Collection and Treatment}
+\subsection{Data Acquisition and Preparation}
+\label{acquisition}
+Prior to the acquisition phase, we first needed to define a systematic and reproducible method for selecting which GitHub repositories would be the subject of our work.
+
+We used the SEART GitHub search tool \cite{seart} to find the repositories that best fit our purposes. The following filters where applied: Non-fork repositories created before 1\textsuperscript{st} January 2021, with active issues and pull requests functionalities, containing at least 1000 commits, 500 issues, 500 pull requests, 500 stars, 100 forks and 1 release. Resulting in a sample of 6448 repositories. Then we ranked the top 10 main languages of the sample, which were: Python (16.10\% of the repositories), TypeScript (13.62\%), Go (10.72\%), C++ (10.02\%), JavaScript (9.65\%), Java (8.82\%), C\# (5.20\%), C (4.93\%), PHP (4.39\%) and Rust (4.03\%). As our objective for this work was to analyze popular and well-stablished projects, the repositories were ordered by the number of stars, and the top 15 repositories of each language were selected. To perform the final selection, we analyzed all the 150 resulting repositories and picked 3 library or framework projects of each language.
+
+With our 30 projects in hand, the next step was to collect the history for each one of the repository features. To achieve this, we rely on the use of the follow tools:
+
+\begin{itemize}
+    \item PyDriller \cite{pydriller}, a Python library used to collect data available within Git itself, does not requires communication with the GitHub API.
+    \item PoolinGH \cite{poolingh} is a JavaScript library used to collect data that requires communication with the GitHub API. For this work, we made use from both Rest and GraphQL APIs. This library, in particular, was very useful to queue the thousands of requests we had to make and handle the errors returned by GitHub APIs.
+    \item pytrends-modern \cite{pytrendsmodern} is a Python library used to collect the Google Trends popularity data for the specified repository. This tool is a sucessor for the archived, and deprecated pytrends \cite{pytrends} library.
+\end{itemize}
+
+In addition to these tools, we also used the Python libraries Pandas, NumPy, Matplotlib and SciPy to support the work presented in the sections \ref{synthesis} and \ref{analysis}.
+
+Table \ref{table:features} details all collected data, their respective source and mining tool used.
+
+% The follow table was generated in https://www.tablesgenerator.com, use \begin{table}[H] to pin the table in this part of the text
+\begin{table}[H]
+\caption{GitHub Repository Features Collected}
+\label{table:features}
+\centering
+\begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}X|c|c|}
+\hline
+\textit{\textbf{Feature}}          & \textit{\textbf{Source}} & \textit{\textbf{Mining Tool}} \\ \hline
+Commits                            & GitHub                  & PyDriller                     \\ \hline
+Commit Authors                     & GitHub                  & PyDriller                     \\ \hline
+Forks                              & GitHub                  & PoolinGH                      \\ \hline
+Created Issues                     & GitHub                  & PoolinGH                      \\ \hline
+Closed Issues                      & GitHub                  & PoolinGH                      \\ \hline
+Authors that Created Issues        & GitHub                  & PoolinGH                      \\ \hline
+Authors that Closed Issues         & GitHub                  & PoolinGH                      \\ \hline
+Created Pull Requests              & GitHub                  & PoolinGH                      \\ \hline
+Closed Pull Requests               & GitHub                  & PoolinGH                      \\ \hline
+Merged Pull Requests               & GitHub                  & PoolinGH                      \\ \hline
+Authors that Created Pull Requests & GitHub                  & PoolinGH                      \\ \hline
+Authors thats Closed Pull Requests & GitHub                  & PoolinGH                      \\ \hline
+Authors that Merged Pull Requests  & GitHub                  & PoolinGH                      \\ \hline
+Stars                              & GitHub                  & PoolinGH                      \\ \hline
+Relative Interest                  & Google                  & pytrends-modern               \\ \hline
+\end{tabularx}
+\end{table}
+
+It is worth noting that the inclusion of watchers would also be an interesting feature for this study, however, GitHub does not provide a way to collect the historical data regarding this feature. This means that it is only possible to obtain the number of watchers as it stands at the time of data collection, making our analysis impracticable for this feature.
+
+With the historical data collected for each repository, a crucial step before continuing the analysis is the normalization of the dataset. First of all, we created a monthly view for each one of the features, aggregating the authors and summating the events that was daily distributed. If a feature had no events recorded for a given month, we consider the value for that month to be zero. Next, we merged all the different features into an unified view for each project, to make further analysis simpler.
+
+\subsection{Synthesis}
+\label{synthesis}
+Before calculating the correlation of the data, we performed an Anderson-Darling (AD) test \cite{anderson.darling} for each feature in each repository. AD test is used to determine whether a dataset follows a specific distribution, in our case, we employed it to verify whether the data follows a normal distribution. We consider the distribution to be normal when the p-value is greater than 0.05, otherwise, we consider it non-normal.
+
+With this information whe applied Pearson's and Spearman's correlations to the data. For the pairs which both features represented normal distributions according to AD test, we considered Pearson's correlation, as it is more indicated for this use case. Otherwise, if none or only one of the features presents a normal distribution, Spearman's rank was considered in the final analysis.
+
+\subsection{Analysis}
+\label{analysis}
 TODO
 
 \section{Results}
+TODO
+
+\section{Future Work}
 TODO
 
 \section{Conclusions}
