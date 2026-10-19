@@ -43,13 +43,20 @@ T, O, D, O.
 \section{Introduction}
 TODO
 
-\section{Related Work}
-TODO
-\cite{DBLP:journals/corr/BorgesHV16a}
-\cite{10.1145/3793302.3793350}
-\cite{COELHO2020106274}
-\cite{10.1145/3555228.3555264}
-\cite{WANG2023111806}
+\section{Literature Review}
+Studies based on repository features can be very different from each other, specially when it comes to tools like GitHub, where a large number of functionalities can be found. In this section we will go through the state of art and present how our work can complement it.
+
+\subsection{Related Work}
+Features like stars, contributors, forks, commits and project age have been studied in \cite{factors.impact.popularity}. It points that no correlation was found between stars and repository age, a weak correlation was noticed between stars, commits and contributors, and a strong correlation between stars and forks.
+
+The correlation of popularity metrics such as stars and forks has been studied in \cite{readme.correlation}, the same study also discuss the correlation inside README.md file atributes - number of lines, number of images, update interval, etc - and how it is related to the popularity of the repository. One of the study conclusions is that the repository popularity is directly correlated with the frequency and number of updates in README.md files.
+
+The correlation analysis presented by \cite{random.tree} is an interesting example of how correlation is helpful in telling which data should be discarded when training prediction models. Among of other features analyzed, developers, issues and pull requests is a point in common with our work, the difference is that we look at the authors who performed the issues and pull requests actions, and not just at the events themselves.
+
+Alongside with other 92 factors, \cite{pull.request.decisions} studied how developer and integrator relate to each other, and how this relations can influence on the acceptance rate of pull requests.
+
+\subsection{Contributions}
+Software repositories features - such as issues, pull requests, popularity, commits, among others - have already been extensively studied in different contexts. However, to the best of our knowledge, no study has yet been published that correlates issues and pull requests (as well as their respective authors and reviewers) with other repository popularity metrics.
 
 \section{Methodology}
 This section presents the process of data acquisition, preparation, synthesis and analysis, according to the best practices for Mine Software Repositories (MSR) proposed by \cite{cookbook}.
@@ -64,11 +71,11 @@ With our 30 projects in hand, the next step was to collect the history for each 
 
 \begin{itemize}
     \item PyDriller \cite{pydriller}, a Python library used to collect data available within Git itself, does not requires communication with the GitHub API.
-    \item PoolinGH \cite{poolingh} is a JavaScript library used to collect data that requires communication with the GitHub API. For this work, we made use from both Rest and GraphQL APIs. This library, in particular, was very useful to queue the thousands of requests we had to make and handle the errors returned by GitHub APIs.
-    \item pytrends-modern \cite{pytrendsmodern} is a Python library used to collect the Google Trends popularity data for the specified repository. This tool is a sucessor for the archived, and deprecated pytrends \cite{pytrends} library.
+    \item PoolinGH \cite{poolingh} is a JavaScript library used to collect data that requires communication with the GitHub API. To make better use of the rate-limit consumption, we made use from both Rest and GraphQL APIs. This library, in particular, was very useful to queue the thousands of requests we had to make and handle the errors returned by GitHub APIs.
+    \item pytrends-modern\footnote{https://github.com/yiromo/pytrends-modern} is a Python library used to collect the Google Trends popularity data for the specified repository. This tool is a sucessor for the archived pytrends\footnote{https://github.com/GeneralMills/pytrends} library.
 \end{itemize}
 
-In addition to these tools, we also used the Python libraries Pandas, NumPy, Matplotlib and SciPy to support the work presented in the sections \ref{synthesis} and \ref{analysis}.
+In addition to these tools, we also used the Python libraries Pandas\footnote{https://github.com/pandas-dev/pandas}, NumPy\footnote{https://github.com/numpy/numpy}, Matplotlib\footnote{https://github.com/matplotlib/matplotlib} and SciPy\footnote{https://github.com/scipy/scipy} to support the work presented in the sections \ref{synthesis} and \ref{analysis}.
 
 Table \ref{table:features} details all collected data, their respective source and mining tool used.
 
@@ -106,7 +113,7 @@ With the historical data collected for each repository, a crucial step before co
 \label{synthesis}
 Before calculating the correlation of the data, we performed an Anderson-Darling (AD) test \cite{anderson.darling} for each feature in each repository. AD test is used to determine whether a dataset follows a specific distribution, in our case, we employed it to verify whether the data follows a normal distribution. We consider the distribution to be normal when the p-value is greater than 0.05, otherwise, we consider it non-normal.
 
-With this information whe applied Pearson's and Spearman's correlations to the data. For the pairs which both features represented normal distributions according to AD test, we considered Pearson's correlation, as it is more indicated for this use case. Otherwise, if none or only one of the features presents a normal distribution, Spearman's rank was considered in the final analysis.
+With this information we applied Pearson's and Spearman's correlations to the data. For the pairs which both features represented normal distributions according to AD test, we considered Pearson's correlation, as it is more indicated for this use case. Otherwise, if none or only one of the features presents a normal distribution, Spearman's rank was considered in the final analysis.
 
 \subsection{Analysis}
 \label{analysis}
