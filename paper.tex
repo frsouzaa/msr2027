@@ -1,4 +1,4 @@
-\documentclass[10pt,conference]{IEEEtran}
+\documentclass[10pt,conference,peerreview]{IEEEtran}
 \IEEEoverridecommandlockouts
 % The preceding line is only needed to identify funding in the first footnote. If that is unneeded, please comment it out.
 %Template version as of 6/27/2024
@@ -12,12 +12,13 @@
 \usepackage{xcolor}
 \usepackage{tabularx}
 \usepackage{float}
+\usepackage[hidelinks]{hyperref}
 
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 \begin{document}
 
-\title{Exploring the use of source code repository features to predict future adoption of frameworks and libraries}
+\title{Exploring the Use of Source Code Repository Features to Predict Future Adoption of Frameworks and Libraries}
 
 %\title{Analyzing the historical correlation of GitHub repositories features and popularity}
 
@@ -32,19 +33,20 @@
         higoramario@usp.br}
 }
 
-\maketitle
+%\maketitle
+\IEEEpeerreviewmaketitle %anonimizacao
 
 \begin{abstract}
     Frameworks and libraries are essential in software development, providing common functionality for projects and speeding up the development process.
     When starting new projects that involve software reuse, it is important to choose libraries and frameworks that can be maintained over the long term, thereby avoiding rework and changes that would incur additional costs for the maintenance of the software projects.
-    This study aims to understand which features present in code repositories and software ecosystems--such as commits, pull requests, and forks--can indicate the lifecycle stage of libraries and frameworks, thus pointing out those suitable for use in software projects.
-    In this first stage, we collected data from 30 real-world open-source projects across 10 different programming languages and analyzed the correlation between repository characteristics, such as commits, issues, and pull requests. We also examined the evolution of commits over time using the Exponential Moving Average.
+    This study aims to understand which features present in code repositories--such as commits, pull requests, and forks--can indicate the lifecycle stage of libraries and frameworks, thus pointing out those suitable for use in software projects.
+    In this first stage, we collected data from 30 real-world open-source projects across 10 different programming languages and analyzed the correlation between repository characteristics, such as commits, issues, and pull requests. We also examined the evolution of these features over time using the Exponential Moving Average, which serves as a trend indicator for prices in economics.
     The preliminary results indicate that some features, such as created pull requests, created issues, and commits, are highly correlated with their respective authors. We also plotted these features over the lifespan of the project, which makes it possible to observe variations—for instance, in the number of stars and the level of interest in the projects evaluated thus far.
     The next steps will involve choosing other features--such as the interdependencies between projects--selecting the features that best distinguish the lifecycle stage of frameworks and libraries, and employing time-series prediction algorithms such as ARIMA (AutoRegressive Integrated Moving Average) and SARIMA (Seasonal ARIMA).
 \end{abstract}
 
 \begin{IEEEkeywords}
-    Mining software repositories, software reuse, frameworks, libraries.
+    Software lifecycle, software reuse, frameworks, libraries, mining software repositories.
 \end{IEEEkeywords}
 
 \section{Introduction}
@@ -59,9 +61,9 @@ As with other software systems, frameworks and libraries go through various stag
 
 Mining software repositories (MSR) can be used to analyze the evolution patterns of open source software projects over time \cite{gold2022,hassan2008}. Therefore, applying MSR to frameworks and libraries may be helpful to analyze how software projects use such tools and how the features present in their repositories (e.g., issues, commits, stars, content of bug reports, etc.) evolve.
 
-In this study, we will develop a methodology to predict the lifecycle stage of frameworks and libraries. To do this, we will use data from repositories of open source libraries and frameworks, as well as other data sources, such as build and dependency management tools (e.g., npm, Maven), Q \& A websites, and code quality metrics. Our goal is to provide a decision-support tool that can be useful for software teams to decide which libraries and frameworks should be chosen to include in software development projects.
+In this study, we develop a methodology to predict the lifecycle stage of frameworks and libraries. To do this, we use data from repositories of open source libraries and frameworks, as well as other data sources, such as build and dependency management tools (e.g., npm, Maven), Q \& A websites, and code quality metrics. Our goal is to provide a decision-support tool that can be useful for software teams to decide which libraries and frameworks should be chosen to include in software development projects.
 
-In our preliminary analyses presented in this work, we analyze the correlation of 15 repository features related to source code  evolution and projects' popularity. We also present how these features evolve over the projects' timeline using the exponential moving average (EMA). We selected a sample of 30 repositories, including real-world frameworks and libraries from 10 programming languages. These data will be used to select features for the model we are building. We will evaluate those features using Machine Learning models and time series forecasting statistical models such as AutoRegressive Integrated Moving Average (ARIMA) and its variants (e.g., SARIMA, SARIMAX) to respond to the following research questions.
+In our preliminary analyses presented in this work, we analyze the correlation of 15 repository features related to source code evolution and projects' popularity. We also present how these features evolve over the projects' timeline using the Exponential Moving Average (EMA), a time series trend indicator used in economics \cite{hunter1986}. We selected a sample of 30 repositories, including real-world frameworks and libraries from 10 programming languages. These data will be used to select features for the model we are building. We will evaluate those features using Machine Learning models--such as random forest--and time series forecasting statistical models such as AutoRegressive Integrated Moving Average (ARIMA) and its variants (e.g., SARIMA, SARIMAX) to respond to the following research questions.
 
 \subsection{Research Questions}
 
@@ -75,51 +77,47 @@ Section~\ref{sec:background} shows the related work. Section~\ref{sec:methodolog
 
 \section{Related work}
 \label{sec:background}
-Studies based on repository features can be very different from each other, especially when it comes to tools like GitHub, where a large number of functionalities can be found. In this section, we will go through the state of the art and present how our work can complement it.
+Previous studies have investigated how repository features may help to comprehend software evolution. In this section, we present the state of the art and how our work can complement it.
 
-% -------------------------------------------------------------------------------
-\color{red}
-Ajustar para papers mais relacionados com o tema geral
-\color{black}
-% -------------------------------------------------------------------------------
-% Fulanos propuseram a técnica x, que usa tais dados e ferramentas. A metodologia é essa. Os resultados são (ferramenta, taxa de mortalidade).
-% tecnica x foi proposta por, e nela...
+The K-Spectral Centroid (KSC) algorithm used features such as stars, contributors, forks, commits, and project age \cite{borges2016}. Based on the resulting clustering model, the authors proposed the following patterns of repository popularity growth: slow, moderate, fast, and viral. Also, the study pointed out a strong correlation between stars and forks.
 
-Features like stars, contributors, forks, commits, and project age have been studied in \cite{factors.impact.popularity}. It points out that no correlation was found between stars and repository age, a weak correlation was noticed between stars, commits, and contributors, and a strong correlation between stars and forks.
+% The correlation of popularity metrics such as stars and forks has been studied in \cite{wang2023}; the same study also discusses the correlation inside README.md file attributes--number of lines, number of images, update interval, etc.--and how it is related to the popularity of the repository. One of the study conclusions is that the repository popularity is directly correlated with the frequency and number of updates in README.md files.
 
-The correlation of popularity metrics such as stars and forks has been studied in \cite{readme.correlation}; the same study also discusses the correlation inside README.md file attributes-- number of lines, number of images, update interval, etc.--and how it is related to the popularity of the repository. One of the study conclusions is that the repository popularity is directly correlated with the frequency and number of updates in README.md files.
+The study of \cite{coelho2020} built a Random Forest model based on repository features--such as commits, developers, issues, pull requests, etc. The proposed model was able to predict whether a repository is maintained or not. Furthermore, the authors established a metric to assess the risk of projects becoming unmaintained. A browser extension tool, which is no longer available, was designed to extract data and calculate the proposed metrics for new repositories. Additionally, the correlation analysis presented serves as an interesting example of how correlation helps identify which data should be discarded during the training of predictive models.
 
-The correlation analysis presented by \cite{random.tree} is an interesting example of how correlation is helpful in telling which data should be discarded when training prediction models. Among other features analyzed, developers, issues, and pull requests are a point in common with our work; the difference is that we look at the authors who performed the issue and pull request actions, and not just at the events themselves.
+Package centrality is the method proposed by \cite{mujahid2022} for identifying packages in decline. This methodology involves applying Google's PageRank algorithm to the dependency relationships between NPM packages. By performing this procedure based on historical records, the authors were able to predict whether or not a project is in decline. The authors developed a Chrome browser extension that displays this centrality, along with other metrics, on the npm website.
 
-Alongside other 92 factors, \cite{pull.request.decisions} studied how developers and integrators relate to each other, and how these relations can influence the acceptance rate of pull requests.
+% Alongside other 92 factors, \cite{zhang2023} studied how developers and integrators relate to each other, and how these relations can influence the acceptance rate of pull requests.
+
+Although limited in scope, the lifecycle analysis conducted by \cite{soupinski2022} identified that prior to the repository's official death, there is a tendency toward low response rates on Stack Overflow and issue resolution. Following the death, there is no further evolution in the number of codebase commits.
 
 \subsection{Contributions}
-In addition to utilizing certain features presented in previous studies—such as commits, stars, forks, and contributors—this article analyzes relative interest via Google Trends, as well as the authors and reviewers of issues and pull requests. The next phase of our research will involve the analysis of releases, question and answer (Q\&A) websites, dependency relationships, source code metrics, and bug reports. We intend to apply various predictive models to the collected data, including machine learning techniques (e.g., Random Forest, SVM) and statistical time-series forecasting models (e.g., ARIMA, SARIMA, SARIMAX). However, to make this possible, a fundamental step is to examine the correlation between the data and conduct an initial trend analysis, topics which are the focus of this article.
+In addition to utilizing certain features presented in previous studies—such as commits, stars, forks, and contributors—this article analyzes relative interest via Google Trends, as well as the authors and reviewers of issues and pull requests. The next phase of our research will involve the analysis of watchers, releases, question-and-answer (Q\&A) websites, dependency relationships, source code metrics, and bug reports. We intend to apply various predictive models to the collected data, including machine learning models (e.g., Random Forest, SVM) and statistical time-series forecasting models (e.g., ARIMA, SARIMA, SARIMAX). However, to make this possible, a fundamental step is to examine the correlation between the data and conduct an initial trend analysis, topics that are the focus of this article.
 
 \section{Methodology}
 \label{sec:methodology}
-This section presents our methodology, which includes the steps done until now-- the process of data acquisition, preparation, and synthesis--, according to the best practices for MSR \cite{cookbook}. Also, we describe the next steps we planned for this research.
+This section presents our methodology, which includes the steps done until now-- the process of data gathering, preparation, and analysis--, according to the best practices for MSR \cite{cookbook}. Also, we describe the next steps we planned for this research.
 
-\subsection{Data acquisition and preparation}
-\label{acquisition}
-Prior to the acquisition phase, we first needed to define a systematic and reproducible method for selecting which GitHub repositories would be the subject of our work.
+\subsection{Data gathering and preparation}
+\label{gathering}
+Prior to the gathering phase, we first needed to define a systematic and reproducible method for selecting which GitHub repositories would be the subject of our work.
 
-We used the SEART GitHub search tool \cite{seart} to find the repositories that best fit our purposes. The following filters were applied: Non-fork repositories created before 1\textsuperscript{st} January 2021, with active issues and pull request functionality, containing at least 1,000 commits, 500 issues, 500 pull requests, 500 stars, 100 forks, and 1 release. Resulting in a sample of 6,448 repositories. Then we ranked the top 10 main languages of the sample, which were: Python (16.10\% of the repositories), TypeScript (13.62\%), Go (10.72\%), C++ (10.02\%), JavaScript (9.65\%), Java (8.82\%), C\# (5.20\%), C (4.93\%), PHP (4.39\%), and Rust (4.03\%). As our objective for this work was to analyze popular and well-established projects, the repositories were ordered by the number of stars, and the top 15 repositories of each language were selected. To perform the final selection, we analyzed all 150 resulting repositories and picked 3 library or framework projects of each language. The selected repositories can be found in Table \ref{table:repositories}.
+We used the SEART GitHub search tool \cite{seart} to find the repositories that best fit our purposes. The following filters were applied: non-fork repositories created before 1\textsuperscript{st} January 2021, with active issues and pull request functionality, containing at least 1,000 commits, 500 issues, 500 pull requests, 500 stars, 100 forks, and 1 release. These criteria resulted in a sample of 6,448 repositories. Then we ranked the top 10 languages--based on the primary language of the projects in the sample--which were: Python (16.10\% of the repositories), TypeScript (13.62\%), Go (10.72\%), C++ (10.02\%), JavaScript (9.65\%), Java (8.82\%), C\# (5.20\%), C (4.93\%), PHP (4.39\%), and Rust (4.03\%). As our objective for this work was to analyze popular and well-established projects, the repositories were ordered by the number of stars, and the top 15 repositories of each language were selected. To perform the final selection, we analyzed all 150 resulting repositories and picked 3 library or framework projects of each language. The selected repositories can be found in Table \ref{table:repositories}.
 
-With our 30 projects in hand, the next step was to collect the history for each one of the repository features. To achieve this, we rely on the use of PyDriller \cite{pydriller}, PoolinGH \cite{poolingh}, and pytrends-modern\footnote{https://github.com/yiromo/pytrends-modern}
+With our 30 projects in hand, the next step was to collect the history for each one of the 15 repository features. To achieve this, we rely on the use of PyDriller \cite{pydriller}, PoolinGH \cite{poolingh}, and pytrends-modern\footnote{https://github.com/yiromo/pytrends-modern}
 
 % se sobrar tempo, injetar os links no pdf
 \begin{table*}[ht]
-    \caption{GitHub Repositories Collected}
+    \caption{GitHub Repositories Collected by Language and Sorted by Number of Stars}
     \label{table:repositories}
     \centering
     \resizebox{\textwidth}{!}{%
         \begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
             \hline
             \textit{\textbf{Python}} & \textit{\textbf{TypeScript}} & \textit{\textbf{Go}} & \textit{\textbf{C++}} & \textit{\textbf{JavaScript}} & \textit{\textbf{Java}} & \textit{\textbf{C\#}} & \textit{\textbf{C}} & \textit{\textbf{PHP}} & \textit{\textbf{Rust}} \\ \hline
-            fastapi                  & angular                      & hugo                 & electron              & react                        & spring-boot            & aspnetcore            & nginx               & framework             & fd                     \\ \hline
-            pytorch                  & vue                          & gin-gin              & opencv                & bootstrap                    & guava                  & maui                  & curl                & phpmailer             & ripgrep                \\ \hline
-            flask                    & puppeteer                    & traefik              & json                  & axios                        & dubbo                  & avalonia              & openssl             & phpunit               & bevy                   \\ \hline
+            fastapi                  & vue                      & hugo                 & electron              & react                        & spring-boot            & aspnetcore            & curl               & framework             & ripgrep                     \\ \hline
+            pytorch                  & angular                          & gin              & opencv                & bootstrap                    & guava                  & avalonia                  & nginx                & phpmailer             & bevy                \\ \hline
+            flask                    & puppeteer                    & traefik              & json                  & axios                        & dubbo                  & maui              & openssl             & phpunit               & fd                   \\ \hline
         \end{tabular}%
     }
 \end{table*}
@@ -133,21 +131,23 @@ Pytrends-modern is a Python library used to collect Google Trends popularity dat
 % Se sobrar espaço a gente coloca :)
 % In addition to these tools, we also used the Python libraries Pandas\footnote{https://github.com/pandas-dev/pandas}, NumPy\footnote{https://github.com/numpy/numpy}, Matplotlib\footnote{https://github.com/matplotlib/matplotlib} and SciPy\footnote{https://github.com/scipy/scipy} to support the work presented in the sections \ref{synthesis} and \ref{sec:results}.
 
-It is worth noting that the inclusion of watchers would also be an interesting feature for this study. However, GitHub does not provide a way to collect the historical data regarding this feature. This means that it is only possible to obtain the number of watchers as it stands at the time of data collection, making our analysis impracticable for this feature.
+% ta ocupando muito espaço... adicionei na sessão \subsection{Contributions}
+% It is worth noting that the inclusion of watchers would also be an interesting feature for this study. However, GitHub does not provide a way to collect the historical data regarding this feature. This means that it is only possible to obtain the number of watchers as it stands at the time of data collection, making our analysis impracticable for this feature.
 
 With the historical data collected for each repository, a crucial step before proceeding with the analysis is the normalization of the dataset. First, we created a monthly view for each metric by aggregating authors and summing the events that were originally distributed on a daily basis. If a metric showed no recorded events for a given month, we assigned a value of zero for that month. Since all data were collected during the first week of October 2026, information pertaining to that month was excluded. Therefore, for each repository, we analyzed the period spanning from its creation up to September 2026. Subsequently, we consolidated all the various metrics into a unified view for each project to simplify further analysis.
 
-\subsection{Synthesis}
+\subsection{Analysis}
 \label{synthesis}
-Before calculating the correlation between collected features, we performed an Anderson-Darling (AD) test \cite{anderson.darling} for each feature in each repository. AD test is used to determine whether a dataset follows a specific distribution. In our case, we employed it to verify whether the data follows a normal distribution. We consider the distribution to be normal when the p-value is greater than 0.05. Otherwise, we consider it non-normal.
+Our initial analysis is composed of statistical correlation analysis and calculation of the Exponential Moving Average (EMA) over the chosen features.
+Before calculating the correlation between collected features, we performed an Anderson-Darling (AD) test \cite{anderson.darling} for each feature in each repository. AD test is used to determine whether a dataset follows a specific distribution. In our case, we employed it to verify whether the data follows a normal distribution. We consider the distribution to be normal when the p-value is greater than 0.05. Otherwise, we cannot consider that the feature follows a normal distribution.
 
-With this information, we applied Pearson's and Spearman's correlations to the data. Both methods range between -1 and 1. For the pairs in which both features represented normal distributions according to AD test, we considered Pearson's correlation, as it is more indicated for this use case \cite{pearson.spearman}. Otherwise, if none or only one of the features presents a normal distribution, Spearman's rank was considered in the final analysis. Finally, for both Pearson and Spearman, we consider values above 0.7 to be a high correlation, and values below 0.3 to be a low correlation. Any number falling within this range is considered a moderate correlation.
+With this information, we applied Pearson's and Spearman's correlations to the data. Both methods range between -1 and 1. For the pairs of features in which both have a normal distribution, we considered Pearson's correlation, as it is more appropriate for this use case \cite{pearson.spearman}. Otherwise, if none or only one of the features presents a normal distribution, Spearman's rank correlation was considered in the analysis. Finally, for both Pearson and Spearman, we consider values above 0.7 to be a high correlation, and values below 0.3 to be a low correlation. Any number falling within this range is considered a moderate correlation.
 
-We also applied the Exponential Moving Average (EMA) method to all the collected features. The EMA is used to generate averages that are more sensitive to recent data points than to older ones, this is well-suited to our scenario, in which new events--such as commits, issues, stars, etc.--are more relevant than past events when assessing the current stage of a repository's lifecycle. For this study, we considered two distinct values for the EMA weighting factor ($\alpha$): $\alpha$ = 0.16 (short-term EMA), to produce a metric more sensitive to recent data, and $\alpha$ = 0.08 (long-term EMA), for a metric less sensitive to new changes. By comparing the two, we can determine whether a project shows a downward trend, an upward trend, or is stable. If the short-term EMA value is higher than the long-term EMA value, the feature is considered to be in an upward trend, otherwise, it is in a downward trend. If the values are equal, the feature is considered stable.
+We also applied the EMA method to all the collected features. The EMA is used to generate averages that are more sensitive to recent data points than to older ones. This is well-suited to our scenario, in which new events--such as commits, issues, stars, etc.--are more relevant than past events when assessing the current stage of a repository's lifecycle. For this study, we considered two distinct values for the EMA weighting factor ($\alpha$): $\alpha$ = 0.16 (short-term EMA), to produce a metric more sensitive to recent data, and $\alpha$ = 0.08 (long-term EMA), for a metric less sensitive to new changes. By comparing the two, we can determine whether a project shows a downward trend, an upward trend, or is stable. If the short-term EMA value is higher than the long-term EMA value, the feature is considered to be in an upward trend. Otherwise, it is in a downward trend. If the values are equal, the feature is considered stable.
 
 \section{Preliminary results}
 \label{sec:results}
-At the end of the experiments, we recorded 59,554 distinct pull request creators and 468,957 pull requests created. Of these pull requests, 273,062 were closed, and 183,546 were merged, with 12,349 pull requests remaining open at the time of writing this article. Regarding issues, 390,554 issues were recorded, created by 156,105 distinct users. Of these, 353,274 were closed, leaving 37,280 issues open. In addition, we collected 886,458 commits authored by 38,917 distinct authors.
+At the end of these initial experiments, we recorded 59,554 distinct pull request creators and 468,957 pull requests created. Of these pull requests, 273,062 were closed, and 183,546 were merged, with 12,349 pull requests remaining open at the time of writing this paper. Regarding issues, 390,554 issues were recorded, created by 156,105 distinct users. Of these, 353,274 were closed, leaving 37,280 issues open. In addition, we collected 886,458 commits authored by 38,917 distinct authors.
 
 All 30 repositories we analyzed showed a high correlation between the number of pull requests created and the number of authors who created them. Vue was the project with the highest correlation between these features. Fig. \ref{vue} shows the history of these features for this repository. The same was true for the relationship between issues created and their respective creators, as well as between closed pull requests and the individuals who closed them -- a high correlation was observed in 29 repositories. Furthermore, 28 repositories showed a high correlation between closed issues and the individuals who closed them. Regarding commits and their authors, as well as merged pull requests and the individuals who performed those merges, we identified 27 repositories with a high correlation. It is worth noting that, in all these cases, the projects that did not exhibit a high correlation fell into a moderate range.
 
@@ -160,29 +160,59 @@ All 30 repositories we analyzed showed a high correlation between the number of 
 
 On the other side, features related to popularity--which in this study is represented by stars, forks, and Google relative interest--generally showed a low to moderate correlation when compared with features related to software development--commits, issues, pull requests, and their respective authors. Among these, forks and stars formed the pair with the highest number of instances classified as having a high correlation, spanning 13 repositories. The pairs (stars, relative interest) and (forks, relative interest) showed, respectively, 24 and 26 repositories with a low to moderate correlation. It is worth noting that the only pairs that did not show any repositories with a high correlation were (forks, commits) and (forks, commit authors), which may be related to the high correlation that exists between commits and the authors of those commits.
 
-% -------------------------------------------------------------------------------
-\color{red}
-Finalizar sessão com resultados do EMA
-\color{black}
-% -------------------------------------------------------------------------------
+Figures \ref{react} and \ref{pytorch} illustrate the correlation plots for react and pytorch, respectively. These two libraries differ in terms of correlation: while react largely follows the trends presented earlier, pytorch represents an edge case, in which most of the features exhibit a moderate to high correlation with one another.
 
+Based on the EMA analysis proposed earlier in this paper, we observe that commits, pull requests, forks, and interest show an upward trend in the majority of the analyzed repositories, while issues and stars show a downward trend in most of them. Table \ref{table:ema} illustrates this behavior. Fig. \ref{curl} presents the Google relative interest for curl and the corresponding shot and long EMA analysis, which, in this case, points to an upward trend.
+
+\begin{table}[htbp]
+    \caption{Number of Uptrend Repositories (UR) and Downtrend Repositories (DR) for each feature}
+    \label{table:ema}
+    \centering
+    \resizebox{\columnwidth}{!}{%
+        \begin{tabular}{|>{\centering\arraybackslash}p{2cm}|>{\centering\arraybackslash}p{0.5cm}|>{\centering\arraybackslash}p{0.5cm}|>{\centering\arraybackslash}p{2cm}>{\centering\arraybackslash}p{0.5cm}>{\centering\arraybackslash}p{0.5cm}|}
+            \hline
+            \textit{\textbf{Feature}} & \textit{\textbf{UR}} & \textit{\textbf{DR}} & \multicolumn{1}{>{\centering\arraybackslash}p{2cm}|}{\textit{\textbf{Feature}}} & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{\textit{\textbf{UR}}} & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{\textit{\textbf{DR}}} \\ \hline
+            commits                   & 23                   & 7                    & \multicolumn{1}{>{\centering\arraybackslash}p{2cm}|}{pulls\_created}            & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{27}                   & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{3}                    \\ \hline
+            commited\_by              & 23                   & 7                    & \multicolumn{1}{>{\centering\arraybackslash}p{2cm}|}{pulls\_closed}             & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{23}                   & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{7}                    \\ \hline
+            issues\_created           & 5                    & 25                   & \multicolumn{1}{>{\centering\arraybackslash}p{2cm}|}{pulls\_merged}             & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{22}                   & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{8}                    \\ \hline
+            issues\_closed            & 11                   & 19                   & \multicolumn{1}{>{\centering\arraybackslash}p{2cm}|}{pulls\_created\_by}        & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{27}                   & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{3}                    \\ \hline
+            issues\_created\_by       & 2                    & 28                   & \multicolumn{1}{>{\centering\arraybackslash}p{2cm}|}{pulls\_closed\_by}         & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{23}                   & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{7}                    \\ \hline
+            issues\_closed\_by        & 2                    & 28                   & \multicolumn{1}{>{\centering\arraybackslash}p{2cm}|}{pulls\_merged\_by}         & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{20}                   & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{10}                   \\ \hline
+            stars                     & 7                    & 23                   & \multicolumn{1}{>{\centering\arraybackslash}p{2cm}|}{Interest}                  & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{25}                   & \multicolumn{1}{>{\centering\arraybackslash}p{0.5cm}|}{5}                    \\ \hline
+            forks                     & 23                   & 7                    &                                                                                 &                                                                              & \multicolumn{1}{c}{}                                                         \\ \cline{1-3}
+        \end{tabular}
+        %
+    }
+\end{table}
 
 \begin{figure}[htbp]
     \centering
     \includesvg[width=\columnwidth]{react.svg}
-    \caption{Correlation analysis of react}
+    \caption{Correlation analysis of React}
     \label{react}
 \end{figure}
 
+\begin{figure}[htbp]
+    \centering
+    \includesvg[width=\columnwidth]{pytorch.svg}
+    \caption{Correlation analysis of PyTorch}
+    \label{pytorch}
+\end{figure}
 
-\section{Conclusions}
+\begin{figure}[htbp]
+    \centering
+    \includesvg[width=\columnwidth]{curl.svg}
+    \caption{Correlation analysis of curl}
+    \label{curl}
+\end{figure}
+
+
+\section{Conclusion}
 \label{sec:conclusion}
-TODO
-%\section{Next Steps}%dentro de conclusions
-Features derivadas de issue, commit, pr parecidas entre si, mas diferentes  uma da outra . EMA para features os gráficoss de vue e X mostrou (resultado) a tendência uptrend or downtrend. Essas tendências serão usadas para decidir o lifecycle stage of frameworks and libraries.
-TODO
-Using PCA (Principal Component Analysis) to choose the features for the model.
-Ampliar o número de projetos baseado no SEART.
+Features derived from issues, commits, and pull requests (e.g., created and closed issues) are highly correlated but distinct from the others (e.g., created issues and created pull requests). Using EMA, the resulting charts reveal trends, specifically whether there is an upward or downward trajectory. These trends will be used to determine the lifecycle stage of frameworks and libraries after we choose the most relevant features.
+
+The next steps include using PCA (Principal Component Analysis) for feature selection. We will also include more projects using SEART. Then, we will use several time series analysis techniques to predict the lifecycle trends of frameworks and libraries.
+
 
 \bibliographystyle{plain}
 \bibliography{references}
